@@ -1,70 +1,90 @@
 const BadgeSize = {
-	single: '4x3',
-	double: '4x6'
-}
+  single: "4x3",
+  double: "4x6",
+};
 
 const Print = {
-	standart: 'color',
-	fast: 'zpl'
-}
+  standart: "color",
+  fast: "zpl",
+};
 
 enum BadgeTypesEnum {
-	COLOR = 'color',
-	MONO = 'mono'
+  COLOR = "color",
+  MONO = "mono",
 }
 
 type BadgeSizeType = keyof typeof BadgeSize;
 type PrintType = keyof typeof Print;
 
+type BadgeTypeMap = [`${BadgeSizeType}_${PrintType}`, BadgeTypesEnum];
+
+enum GradeMarksEnum {
+  PASS = 1,
+  DONT_PASS = 0,
+}
+
+type Grade = {
+  workName: string;
+  mark: GradeMarksEnum;
+};
+
+type Visit = {
+  lesson: string;
+  present: boolean;
+};
 
 class Student {
-	badgeTypeMap = new Map<any,  any>([
-		['single_fast', BadgeTypesEnum.COLOR],
-		['single_standart', BadgeTypesEnum.COLOR],
-		['double_fast', BadgeTypesEnum.MONO],
-		['double_standart', BadgeTypesEnum.MONO]
-	])
+  badgeTypeMap: BadgeTypeMap[] = [
+    ["single_fast", BadgeTypesEnum.COLOR],
+    ["single_standart", BadgeTypesEnum.COLOR],
+    ["double_fast", BadgeTypesEnum.MONO],
+    ["double_standart", BadgeTypesEnum.MONO],
+  ];
 
-	_firstName;
-	_lastName;
-	_birthYear;
-	_grades = []; // Опишите, как объект у которого есть поле workName и mark(оценка может быть выполненно или нет)
-	_visits = []; // Опишите, как объект у которого есть поле lesson (любое имя) и present
+  _firstName: string;
+  _lastName: string;
+  _birthYear: number;
+  _grades: Grade[] = []; // Опишите, как объект у которого есть поле workName и mark(оценка может быть выполненно или нет)
+  _visits: Visit[] = []; // Опишите, как объект у которого есть поле lesson (любое имя) и present
 
-	get fullName() {
-		return `${this._lastName} ${this._firstName}`;
-	}
-	
-	set fullName(value) {
-		[this._lastName, this._firstName] = value.split(' ');
-	}
+  get fullName(): string {
+    return `${this._lastName} ${this._firstName}`;
+  }
 
-	get age() {
-		return new Date().getFullYear() - this._birthYear;
-	}
+  set fullName(value: string) {
+    [this._lastName, this._firstName] = value.split(" ");
+  }
 
-	constructor(firstName, lastName, birthYear) {
-		this._firstName = firstName;
-		this._lastName = lastName;
-		this._birthYear = birthYear;
-	}
+  get age(): number {
+    return new Date().getFullYear() - this._birthYear;
+  }
 
-	setGrade(grade: any) {
-		this._grades.push(grade);
-	}
+  constructor(firstName: string, lastName: string, birthYear: number) {
+    this._firstName = firstName;
+    this._lastName = lastName;
+    this._birthYear = birthYear;
+  }
 
-	setVisit(visit: any) {
-		this._grades.push(visit);
-	}
+  setGrade(grade: Grade): void {
+    this._grades.push(grade);
+  }
 
-	getPerformanceRating() {
-		const gradeValues = Object.values(this._grades);
+  setVisit(visit: Visit): void {
+    this._visits.push(visit);
+  }
 
-		if (!gradeValues.length) return 0;
+  getPerformanceRating(): number {
+    const gradeValues = Object.values(this._grades);
 
-		const averageGrade = gradeValues.reduce((sum, grade) => sum + grade, 0) / gradeValues.length;
-		const attendancePercentage = (this._visits.filter(present => present).length / this._visits.length) * 100;
+    if (!gradeValues.length) return 0;
 
-		return (averageGrade + attendancePercentage) / 2;
-	}
+    const averageGrade =
+      gradeValues.reduce((sum, grade) => sum + grade.mark, 0) /
+      gradeValues.length;
+    const attendancePercentage =
+      (this._visits.filter((present) => present).length / this._visits.length) *
+      100;
+
+    return (averageGrade + attendancePercentage) / 2;
+  }
 }
